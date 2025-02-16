@@ -1,0 +1,20 @@
+# Messages shown in game
+#
+# Hex colors are supported
+# example: &8<#7C3BC1>&l<#8953BF>&lR<#976BBE>&lT<#A483BC>&lP&8]
+#
+only_players: "&fOnly players can use this command."
+already_in_progress: "&cYou already have a teleportation in progress."
+cooldown_message: "&cYou must wait %seconds% more seconds before using this command again."
+not_enough_money: "&cYou don't have enough money to use this command."
+invalid_world: "&cInvalid world specified in config."
+no_safe_location: "&eCould not find a safe location."
+teleport_delay_message: "&eTeleporting in %seconds% seconds..."
+moved_during_delay: "&cYou moved during the teleportation delay. Teleportation cancelled."
+teleport_success: "&aTeleported to a random location!"
+no_permission: "&cYou do not have permission to use this command."
+usage_reload: "&fUsage: /coarizwildtp reload"
+reload_success: "&dCoarizWildTP configuration reloaded."
+economy_reenabled: "&dEconomy features re-enabled."
+economy_disabled: "&cVault or an economy plugin not found! Economy features are disabled."
+reload_failure: "&cFailed to reload CoarizWildTP configuration."

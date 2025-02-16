@@ -1,0 +1,20 @@
+name: Affluence
+version: 1.0
+main: com.coariz.affluence.Affluence
+api-version: 1.21
+authors:
+  - Coariz
+description: Affluence Plugin for Minecraft Server
+commands:
+  affluence:
+    description: Affluence plugin command
+    usage: /<command> <subcommand>
+    aliases:
+      - aff
+permissions:
+  affluence.reload:
+    description: Allows reloading the affluence configuration
+    default: op
+  affluence.admin:
+    description: Allows setting configuration values and managing bans
+    default: op

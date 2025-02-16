@@ -1,0 +1,18 @@
+# Health boost config
+health_boost_per_value: 0.1 # Health boost added per value
+health_boost_value: 10000 # Money needed per health boost
+
+# Damage boost config
+damage_boost_per_value: 0.1 # Damage boost added per value
+damage_boost_value: 1000 # Money needed per health boost
+
+# Conditions
+death_money_loss: 20000 # Money lost per player death
+money_per_kill: 1000  # Amount of money given to the killer per player kill
+negative_money_threshold: -100000  # Threshold for banning players with negative money
+
+# Ban settings
+ban_players: true  # Toggle to enable or disable player bans
+ban_player_for: 30d  # Duration for temporary ban (e.g., 30d, 1y, 10h)
+# Affluence config version 1.0
+# Plugin made by Coariz
