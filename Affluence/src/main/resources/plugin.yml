@@ -11,6 +11,40 @@ commands:
     usage: /<command> <subcommand>
     aliases:
       - aff
+    permission: affluence.admin
+    permission-message: "&cYou don't have permission to do that!"
+    subcommands:
+      reload:
+        description: Reloads the Affluence configuration
+        usage: /affluence reload
+        permission: affluence.reload
+        permission-message: "&cYou don't have permission to reload the configuration!"
+      set:
+        description: Sets a configuration value
+        usage: /affluence set <path> <value>
+        permission: affluence.admin
+        permission-message: "&cYou don't have permission to set configuration values!"
+      balance:
+        description: Shows your Affluence balance
+        usage: /affluence balance
+        aliases:
+          - bal
+        permission: affluence.balance
+        permission-message: "&cYou don't have permission to check your balance!"
+      deposit:
+        description: Deposits money from your Vault balance to your Affluence balance
+        usage: /affluence deposit <amount>
+        aliases:
+          - dep
+        permission: affluence.deposit
+        permission-message: "&cYou don't have permission to deposit money!"
+      withdraw:
+        description: Withdraws money from your Affluence balance to your Vault balance
+        usage: /affluence withdraw <amount>
+        aliases:
+          - with
+        permission: affluence.withdraw
+        permission-message: "&cYou don't have permission to withdraw money!"
 permissions:
   affluence.reload:
     description: Allows reloading the affluence configuration
@@ -18,3 +52,12 @@ permissions:
   affluence.admin:
     description: Allows setting configuration values and managing bans
     default: op
+  affluence.balance:
+    description: Allows players to check their Affluence balance
+    default: true
+  affluence.deposit:
+    description: Allows players to deposit money from their Vault balance to their Affluence balance
+    default: true
+  affluence.withdraw:
+    description: Allows players to withdraw money from their Affluence balance to their Vault balance
+    default: true
