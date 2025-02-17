@@ -30,18 +30,25 @@ public class AffluenceCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-            if (!sender.hasPermission("affluence.admin")) {
-                sender.sendMessage(plugin.formatMessage("&cYou don't have permission to do that!"));
-                return true;
-            }
-
             if (subCommand.equalsIgnoreCase("reload")) {
+                if (!sender.hasPermission("affluence.admin")) {
+                    sender.sendMessage(plugin.formatMessage("&cYou don't have permission to do that!"));
+                    return true;
+                }
                 plugin.reloadConfigurations();
                 sender.sendMessage(plugin.formatMessage("&8[&dAffluence&8] &fPlugin successfully reloaded!"));
                 return true;
             }
 
-            if (subCommand.equalsIgnoreCase("set") && args.length >= 3) {
+            if (subCommand.equalsIgnoreCase("set")) {
+                if (!sender.hasPermission("affluence.admin")) {
+                    sender.sendMessage(plugin.formatMessage("&cYou don't have permission to do that!"));
+                    return true;
+                }
+                if (args.length < 3) {
+                    sender.sendMessage(plugin.formatMessage("&cUsage: /aff set <path> <value>"));
+                    return true;
+                }
                 String path = args[1];
                 String valueStr = args[2];
 
@@ -81,6 +88,10 @@ public class AffluenceCommandExecutor implements CommandExecutor {
                     sender.sendMessage(plugin.formatMessage("&cThis command can only be used by players!"));
                     return true;
                 }
+                if (!sender.hasPermission("affluence.use")) {
+                    sender.sendMessage(plugin.formatMessage("&cYou don't have permission to do that!"));
+                    return true;
+                }
                 Player player = (Player) sender;
                 UUID playerId = player.getUniqueId();
                 double balance = plugin.getPlayerBalance(playerId);
@@ -91,6 +102,10 @@ public class AffluenceCommandExecutor implements CommandExecutor {
             if (subCommand.equalsIgnoreCase("deposit") || subCommand.equalsIgnoreCase("dep")) {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(plugin.formatMessage("&cThis command can only be used by players!"));
+                    return true;
+                }
+                if (!sender.hasPermission("affluence.use")) {
+                    sender.sendMessage(plugin.formatMessage("&cYou don't have permission to do that!"));
                     return true;
                 }
                 Player player = (Player) sender;
@@ -123,6 +138,10 @@ public class AffluenceCommandExecutor implements CommandExecutor {
             if (subCommand.equalsIgnoreCase("withdraw") || subCommand.equalsIgnoreCase("with")) {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(plugin.formatMessage("&cThis command can only be used by players!"));
+                    return true;
+                }
+                if (!sender.hasPermission("affluence.use")) {
+                    sender.sendMessage(plugin.formatMessage("&cYou don't have permission to do that!"));
                     return true;
                 }
                 Player player = (Player) sender;
