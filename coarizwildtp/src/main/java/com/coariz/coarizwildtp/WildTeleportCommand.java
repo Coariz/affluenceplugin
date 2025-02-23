@@ -61,27 +61,15 @@ public class WildTeleportCommand implements CommandExecutor, Listener {
             }
         }
 
-        // Check if economy is enabled
-        if (plugin.isEconomyEnabled()) {
-            double cost = config.getDouble("cost", 0);
-            if (cost > 0) {
-                if (plugin.getEconomy().getBalance(player) < cost) {
-                    player.sendMessage(plugin.colorize(plugin.getLangConfig().getString("not_enough_money", "You don't have enough money to use this command.")));
-                    return true;
-                }
-                plugin.getEconomy().withdrawPlayer(player, cost);
-            }
-        }
-
         World world = Bukkit.getWorld(config.getString("world", player.getWorld().getName()));
         if (world == null) {
-            player.sendMessage(plugin.colorize(plugin.getLangConfig().getString("invalid_world", "Invalid world specified in config.")));
+            player.sendMessage(plugin.colorize(langConfig.getString("invalid_world", "Invalid world specified in config.")));
             return true;
         }
 
         Location safeLocation = findSafeLocation(world);
         if (safeLocation == null) {
-            player.sendMessage(plugin.colorize(plugin.getLangConfig().getString("no_safe_location", "Could not find a safe location.")));
+            player.sendMessage(plugin.colorize(langConfig.getString("no_safe_location", "Could not find a safe location.")));
             return true;
         }
 
@@ -101,7 +89,7 @@ public class WildTeleportCommand implements CommandExecutor, Listener {
                     Location initialLocation = initialLocationMap.get(playerId);
                     if (initialLocation != null && player.getWorld().equals(initialLocation.getWorld())) {
                         if (player.getLocation().distanceSquared(initialLocation) > 0.1) {
-                            player.sendMessage(plugin.colorize(langConfig.getString("moved_during_delay", "You moved during the teleportation delay. Teleportation cancelled.")));
+                            player.sendMessage(plugin.colorize(plugin.getLangConfig().getString("moved_during_delay", "You moved during the teleportation delay. Teleportation cancelled.")));
                             initialLocationMap.remove(playerId);
                             plugin.cooldownMap.remove(playerId);
                             teleportTasks.remove(playerId);
@@ -111,7 +99,7 @@ public class WildTeleportCommand implements CommandExecutor, Listener {
                 }
 
                 player.teleport(safeLocation);
-                player.sendMessage(plugin.colorize(langConfig.getString("teleport_success", "Teleported to a random location!")));
+                player.sendMessage(plugin.colorize(plugin.getLangConfig().getString("teleport_success", "Teleported to a random location!")));
                 initialLocationMap.remove(playerId);
                 plugin.cooldownMap.put(playerId, currentTime);
                 teleportTasks.remove(playerId);

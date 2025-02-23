@@ -1,10 +1,8 @@
 package com.coariz.coarizwildtp;
 
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -19,8 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CoarizWildTP extends JavaPlugin {
 
-    private Economy econ = null;
-    private boolean economyEnabled = false;
     private FileConfiguration langConfig = null;
     private File langFile = null;
     public ConcurrentHashMap<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
@@ -31,12 +27,6 @@ public class CoarizWildTP extends JavaPlugin {
 
         saveDefaultConfig();
         saveLangFile();
-
-        if (setupEconomy()) {
-            setEconomyEnabled(true);
-        } else {
-            getLogger().warning("Vault or an economy plugin not found! Economy features will be disabled.");
-        }
 
         // Register commands
         if (getCommand("wild") != null) {
@@ -93,32 +83,8 @@ public class CoarizWildTP extends JavaPlugin {
         return langConfig;
     }
 
-    public boolean setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            getLogger().warning("Vault plugin not found!");
-            return false;
-        }
-
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            getLogger().warning("No economy provider found!");
-            return false;
-        }
-
-        econ = rsp.getProvider();
-        return econ != null;
-    }
-
     public FileConfiguration getConfig() {
         return super.getConfig();
-    }
-
-    public Economy getEconomy() {
-        return econ;
-    }
-
-    public boolean isEconomyEnabled() {
-        return economyEnabled;
     }
 
     public String colorize(String message) {
@@ -136,8 +102,4 @@ public class CoarizWildTP extends JavaPlugin {
 
         return buffer.toString().replace("&", "§");
     }
-
-	public void setEconomyEnabled(boolean economyEnabled) {
-		this.economyEnabled = economyEnabled;
-	}
 }
