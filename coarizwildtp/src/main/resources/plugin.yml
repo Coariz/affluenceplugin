@@ -1,5 +1,5 @@
 name: CoarizWildTP
-version: 1.0-SNAPSHOT
+version: 1.2
 main: com.coariz.coarizwildtp.CoarizWildTP
 api-version: 1.21
 commands:
@@ -10,13 +10,12 @@ commands:
   coarizwildtp:
     description: Manages CoarizWildTP plugin commands.
     usage: /<command> <subcommand>
-    subcommands:
-      reload:
-        description: Reloads the plugin configuration.
-        permission: coarizwildtp.reload
 permissions:
   coarizwildtp.use:
     description: Allows the player to use the /wild command.
+    default: op
+  coarizwildtp.bypasscooldown:
+    description: Allows the player to bypass the teleportation cooldown.
     default: op
   coarizwildtp.reload:
     description: Allows the admin to reload the plugin configuration.

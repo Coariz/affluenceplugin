@@ -42,10 +42,15 @@ public class WildTeleportCommand implements CommandExecutor, Listener {
         Player player = (Player) sender;
         FileConfiguration config = plugin.getConfig();
         FileConfiguration langConfig = plugin.getLangConfig();
-
-        // Check cooldown
-        long currentTime = System.currentTimeMillis();
         UUID playerId = player.getUniqueId();
+
+        if (player.hasPermission("coarizwildtp.bypasscooldown")) {
+            teleportPlayer(player, config, langConfig);
+            return true;
+        }
+
+        long currentTime = System.currentTimeMillis();
+
         if (teleportTasks.containsKey(playerId)) {
             player.sendMessage(plugin.colorize(langConfig.getString("already_in_progress", "You already have a teleportation in progress.")));
             return true;
@@ -53,10 +58,11 @@ public class WildTeleportCommand implements CommandExecutor, Listener {
 
         if (plugin.cooldownMap.containsKey(playerId)) {
             long lastUsed = plugin.cooldownMap.get(playerId);
-            long cooldownTime = config.getLong("cooldown", 5) * 1000L; // Convert seconds to milliseconds
+            long cooldownTime = config.getLong("cooldown", 5) * 1000L;
             if (currentTime - lastUsed < cooldownTime) {
                 long remainingTime = (lastUsed + cooldownTime - currentTime) / 1000L;
-                player.sendMessage(plugin.colorize(langConfig.getString("cooldown_message", "You must wait %seconds% more seconds before using this command again.").replace("%seconds%", String.valueOf(remainingTime))));
+                player.sendMessage(plugin.colorize(langConfig.getString("cooldown_message", "You must wait %seconds% more seconds before using this command again.")
+                        .replace("%seconds%", String.valueOf(remainingTime))));
                 return true;
             }
         }
@@ -73,15 +79,14 @@ public class WildTeleportCommand implements CommandExecutor, Listener {
             return true;
         }
 
-        int teleportDelay = config.getInt("teleport_delay", 5); // Default delay is 5 seconds
+        int teleportDelay = config.getInt("teleport_delay", 5);
         boolean allowMovementDuringDelay = config.getBoolean("allow_movement_during_delay", false);
 
-        player.sendMessage(plugin.colorize(langConfig.getString("teleport_delay_message", "Teleporting in %seconds% seconds...").replace("%seconds%", String.valueOf(teleportDelay))));
+        player.sendMessage(plugin.colorize(langConfig.getString("teleport_delay_message", "Teleporting in %seconds% seconds...")
+                .replace("%seconds%", String.valueOf(teleportDelay))));
 
-        // Store the player's initial location
         initialLocationMap.put(playerId, player.getLocation());
 
-        // Create a BukkitRunnable task for teleportation
         BukkitRunnable teleportTask = new BukkitRunnable() {
             @Override
             public void run() {
@@ -89,7 +94,7 @@ public class WildTeleportCommand implements CommandExecutor, Listener {
                     Location initialLocation = initialLocationMap.get(playerId);
                     if (initialLocation != null && player.getWorld().equals(initialLocation.getWorld())) {
                         if (player.getLocation().distanceSquared(initialLocation) > 0.1) {
-                            player.sendMessage(plugin.colorize(plugin.getLangConfig().getString("moved_during_delay", "You moved during the teleportation delay. Teleportation cancelled.")));
+                            player.sendMessage(plugin.colorize(langConfig.getString("moved_during_delay", "You moved during the teleportation delay. Teleportation cancelled.")));
                             initialLocationMap.remove(playerId);
                             plugin.cooldownMap.remove(playerId);
                             teleportTasks.remove(playerId);
@@ -99,106 +104,94 @@ public class WildTeleportCommand implements CommandExecutor, Listener {
                 }
 
                 player.teleport(safeLocation);
-                player.sendMessage(plugin.colorize(plugin.getLangConfig().getString("teleport_success", "Teleported to a random location!")));
+                player.sendMessage(plugin.colorize(langConfig.getString("teleport_success", "Teleported to a random location!")));
                 initialLocationMap.remove(playerId);
                 plugin.cooldownMap.put(playerId, currentTime);
                 teleportTasks.remove(playerId);
             }
         };
 
-        // Schedule the teleportation with a delay
-        teleportTask.runTaskLater(plugin, teleportDelay * 20L); // Convert seconds to ticks (1 tick = 0.05 seconds)
-
-        // Store the teleport task in the map
+        teleportTask.runTaskLater(plugin, teleportDelay * 20L);
         teleportTasks.put(playerId, teleportTask);
 
         return true;
+    }
+
+    private void teleportPlayer(Player player, FileConfiguration config, FileConfiguration langConfig) {
+        World world = Bukkit.getWorld(config.getString("world", player.getWorld().getName()));
+        if (world == null) {
+            player.sendMessage(plugin.colorize(langConfig.getString("invalid_world", "Invalid world specified in config.")));
+            return;
+        }
+
+        Location safeLocation = findSafeLocation(world);
+        if (safeLocation == null) {
+            player.sendMessage(plugin.colorize(langConfig.getString("no_safe_location", "Could not find a safe location.")));
+            return;
+        }
+
+        player.teleport(safeLocation);
+        player.sendMessage(plugin.colorize(langConfig.getString("teleport_success", "Teleported to a random location!")));
     }
 
     private Location findSafeLocation(World world) {
         Set<Material> blacklist = new HashSet<>();
         for (String materialName : plugin.getConfig().getStringList("blacklisted_blocks")) {
             Material material = Material.matchMaterial(materialName);
-            if (material != null) {
-                blacklist.add(material);
-            }
+            if (material != null) blacklist.add(material);
         }
 
-        Set<Material> allowedSurfaceMaterials = new HashSet<>();
+        Set<Material> allowedSurfaces = new HashSet<>();
         for (String materialName : plugin.getConfig().getStringList("allowed_surface_materials")) {
             Material material = Material.matchMaterial(materialName);
-            if (material != null) {
-                allowedSurfaceMaterials.add(material);
-            }
+            if (material != null) allowedSurfaces.add(material);
         }
 
-        WorldBorder worldBorder = world.getWorldBorder();
-        Location spawnLocation = world.getSpawnLocation();
-        double spawnRadius = plugin.getConfig().getDouble("spawn_radius", 1000); // Default radius around spawn point
+        WorldBorder border = world.getWorldBorder();
+        Location spawn = world.getSpawnLocation();
+        double spawnRadius = plugin.getConfig().getDouble("spawn_radius", 1000);
 
         int centerX = plugin.getConfig().getInt("center_x", 0);
         int centerZ = plugin.getConfig().getInt("center_z", 0);
         int radius = plugin.getConfig().getInt("radius", 2000);
+        int maxAttempts = plugin.getConfig().getInt("max_attempts", 500);
+        boolean logging = plugin.getConfig().getBoolean("logging_enabled", true);
 
-        int maxAttempts = plugin.getConfig().getInt("max_attempts", 500); // Increased number of attempts
-        boolean loggingEnabled = plugin.getConfig().getBoolean("logging_enabled", true);
-
-        for (int i = 0; i < maxAttempts; i++) { // Try up to maxAttempts times
+        for (int i = 0; i < maxAttempts; i++) {
             int x = centerX + (int) (Math.random() * (2 * radius + 1)) - radius;
             int z = centerZ + (int) (Math.random() * (2 * radius + 1)) - radius;
 
-            // Check if the location is within the world border
-            if (!worldBorder.isInside(new Location(world, x, 0, z))) {
-                if (loggingEnabled) {
-                    plugin.getLogger().info("Attempt " + (i + 1) + ": Location (" + x + ", 0, " + z + ") is outside the world border.");
-                }
+            if (!border.isInside(new Location(world, x, 0, z))) {
+                if (logging) plugin.getLogger().info("Attempt " + (i + 1) + ": (" + x + ", 0, " + z + ") outside world border.");
                 continue;
             }
 
-            // Check if the location is too close to the spawn point
             Location loc = new Location(world, x, 0, z);
-            if (loc.distance(spawnLocation) < spawnRadius) {
-                if (loggingEnabled) {
-                    plugin.getLogger().info("Attempt " + (i + 1) + ": Location (" + x + ", 0, " + z + ") is too close to the spawn point.");
-                }
+            if (loc.distance(spawn) < spawnRadius) {
+                if (logging) plugin.getLogger().info("Attempt " + (i + 1) + ": (" + x + ", 0, " + z + ") too close to spawn.");
                 continue;
             }
 
             int y = world.getHighestBlockYAt(x, z);
             Location safeLoc = new Location(world, x + 0.5, y + 1, z + 0.5);
 
-            if (isSafeSurfaceLocation(safeLoc, blacklist, allowedSurfaceMaterials)) {
-                if (loggingEnabled) {
-                    plugin.getLogger().info("Attempt " + (i + 1) + ": Found safe surface location: " + safeLoc);
-                }
+            if (isSafeSurfaceLocation(safeLoc, blacklist, allowedSurfaces)) {
+                if (logging) plugin.getLogger().info("Safe location found at attempt " + (i + 1) + ": " + safeLoc);
                 return safeLoc;
-            } else {
-                if (loggingEnabled) {
-                    Material below = world.getBlockAt(x, y - 1, z).getType();
-                    plugin.getLogger().info("Attempt " + (i + 1) + ": Location (" + x + ", " + y + ", " + z + ") is not a safe surface location.");
-                    plugin.getLogger().info("Block below: " + below);
-                }
+            } else if (logging) {
+                Material below = world.getBlockAt(x, y - 1, z).getType();
+                plugin.getLogger().info("Attempt " + (i + 1) + ": Unsafe at (" + x + ", " + y + ", " + z + "), block below: " + below);
             }
         }
 
-        if (loggingEnabled) {
-            plugin.getLogger().info("Failed to find a safe surface location after " + maxAttempts + " attempts.");
-        }
+        if (logging) plugin.getLogger().info("Failed to find a safe location after " + maxAttempts + " attempts.");
         return null;
     }
 
-    private boolean isSafeSurfaceLocation(Location loc, Set<Material> blacklist, Set<Material> allowedSurfaceMaterials) {
-        int x = loc.getBlockX();
-        int y = loc.getBlockY();
-        int z = loc.getBlockZ();
+    private boolean isSafeSurfaceLocation(Location loc, Set<Material> blacklist, Set<Material> allowedSurfaces) {
         World world = loc.getWorld();
-
-        Material below = world.getBlockAt(x, y - 1, z).getType();
-
-        if (below.isSolid() && !blacklist.contains(below) && allowedSurfaceMaterials.contains(below)) {
-            return true;
-        }
-        return false;
+        Material below = world.getBlockAt(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ()).getType();
+        return below.isSolid() && !blacklist.contains(below) && allowedSurfaces.contains(below);
     }
 
     @EventHandler
@@ -206,40 +199,29 @@ public class WildTeleportCommand implements CommandExecutor, Listener {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
         FileConfiguration config = plugin.getConfig();
-        FileConfiguration langConfig = plugin.getLangConfig();
-        boolean allowMovementDuringDelay = config.getBoolean("allow_movement_during_delay", false);
+        boolean allowMovement = config.getBoolean("allow_movement_during_delay", false);
 
-        if (!allowMovementDuringDelay && initialLocationMap.containsKey(playerId)) {
-            Location initialLocation = initialLocationMap.get(playerId);
-            if (initialLocation != null && player.getWorld().equals(initialLocation.getWorld())) {
-                if (player.getLocation().distanceSquared(initialLocation) > 0.1) {
-                    player.sendMessage(plugin.colorize(langConfig.getString("moved_during_delay", "You moved during the teleportation delay. Teleportation cancelled.")));
-                    initialLocationMap.remove(playerId);
-                    plugin.cooldownMap.remove(playerId);
+        if (!allowMovement && initialLocationMap.containsKey(playerId)) {
+            Location initial = initialLocationMap.get(playerId);
+            if (initial != null && player.getWorld().equals(initial.getWorld()) &&
+                    player.getLocation().distanceSquared(initial) > 0.1) {
 
-                    // Cancel the teleport task
-                    BukkitRunnable teleportTask = teleportTasks.remove(playerId);
-                    if (teleportTask != null) {
-                        teleportTask.cancel();
-                    }
-                }
+                player.sendMessage(plugin.colorize(plugin.getLangConfig().getString("moved_during_delay", "You moved during the teleportation delay. Teleportation cancelled.")));
+                initialLocationMap.remove(playerId);
+                plugin.cooldownMap.remove(playerId);
+
+                BukkitRunnable task = teleportTasks.remove(playerId);
+                if (task != null) task.cancel();
             }
         }
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        UUID playerId = player.getUniqueId();
-
-        // Remove the player's initial location and cooldown
+        UUID playerId = event.getPlayer().getUniqueId();
         initialLocationMap.remove(playerId);
         plugin.cooldownMap.remove(playerId);
-
-        // Cancel the teleport task
-        BukkitRunnable teleportTask = teleportTasks.remove(playerId);
-        if (teleportTask != null) {
-            teleportTask.cancel();
-        }
+        BukkitRunnable task = teleportTasks.remove(playerId);
+        if (task != null) task.cancel();
     }
 }
