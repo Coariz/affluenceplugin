@@ -1,25 +1,39 @@
 package com.coariz.coarizwildtp;
 
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class CoarizWildTP extends JavaPlugin {
 
+    private Economy econ = null;
+    boolean economyEnabled = false; // Package-private
     private FileConfiguration langConfig = null;
     private File langFile = null;
     public ConcurrentHashMap<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<UUID, Location> initialLocationMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<UUID, BukkitRunnable> teleportTasks = new ConcurrentHashMap<>();
 
     @Override
     public void onEnable() {
@@ -28,17 +42,31 @@ public class CoarizWildTP extends JavaPlugin {
         saveDefaultConfig();
         saveLangFile();
 
+        if (setupEconomy()) { // setupEconomy is public
+            economyEnabled = true;
+        } else {
+            getLogger().warning("Vault plugin not found or no economy provider found! Economy features will be disabled.");
+        }
+
         // Register commands
+        WildTeleportCommand wildTeleportCommand = new WildTeleportCommand(this);
+
         if (getCommand("wild") != null) {
-            getCommand("wild").setExecutor(new WildTeleportCommand(this));
+            getCommand("wild").setExecutor(wildTeleportCommand);
         } else {
             getLogger().severe("Command 'wild' is not defined in plugin.yml!");
         }
 
         if (getCommand("rtp") != null) {
-            getCommand("rtp").setExecutor(new WildTeleportCommand(this));
+            getCommand("rtp").setExecutor(wildTeleportCommand);
         } else {
             getLogger().severe("Command 'rtp' is not defined in plugin.yml!");
+        }
+
+        if (getCommand("rtpadmin") != null) {
+            getCommand("rtpadmin").setExecutor(new RTPAdminCommand(this, wildTeleportCommand));
+        } else {
+            getLogger().severe("Command 'rtpadmin' is not defined in plugin.yml!");
         }
 
         if (getCommand("coarizwildtp") != null) {
@@ -87,6 +115,14 @@ public class CoarizWildTP extends JavaPlugin {
         return super.getConfig();
     }
 
+    public Economy getEconomy() {
+        return econ;
+    }
+
+    public boolean isEconomyEnabled() {
+        return economyEnabled;
+    }
+
     public String colorize(String message) {
         if (message == null) return "";
 
@@ -101,5 +137,29 @@ public class CoarizWildTP extends JavaPlugin {
         matcher.appendTail(buffer);
 
         return buffer.toString().replace("&", "§");
+    }
+
+    public boolean setupEconomy() { // Made public
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            getLogger().warning("Vault plugin not found!");
+            return false;
+        }
+
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            getLogger().warning("No economy provider found!");
+            return false;
+        }
+
+        econ = rsp.getProvider();
+        return econ != null;
+    }
+
+    public ConcurrentHashMap<UUID, Location> getInitialLocationMap() {
+        return initialLocationMap;
+    }
+
+    public ConcurrentHashMap<UUID, BukkitRunnable> getTeleportTasks() {
+        return teleportTasks;
     }
 }

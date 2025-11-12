@@ -1,5 +1,5 @@
 name: CoarizWildTP
-version: 1.2
+version: 1.3
 main: com.coariz.coarizwildtp.CoarizWildTP
 api-version: 1.21
 commands:
@@ -7,16 +7,26 @@ commands:
     description: Teleports you to a random safe location.
     aliases:
       - rtp
+  rtpadmin:
+    description: Forcefully teleports a player to a random safe location.
+    permission: coarizwildtp.admin
   coarizwildtp:
     description: Manages CoarizWildTP plugin commands.
     usage: /<command> <subcommand>
+    subcommands:
+      reload:
+        description: Reloads the plugin configuration.
+        permission: coarizwildtp.reload
 permissions:
   coarizwildtp.use:
     description: Allows the player to use the /wild command.
     default: op
-  coarizwildtp.bypasscooldown:
-    description: Allows the player to bypass the teleportation cooldown.
-    default: op
   coarizwildtp.reload:
     description: Allows the admin to reload the plugin configuration.
+    default: op
+  coarizwildtp.admin:
+    description: Allows the admin to forcefully teleport players.
+    default: op
+  coarizwildtp.bypasscooldown:
+    description: Allows the player to bypass the teleportation cooldown.
     default: op

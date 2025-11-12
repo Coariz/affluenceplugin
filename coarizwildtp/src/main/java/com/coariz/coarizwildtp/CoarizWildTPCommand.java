@@ -27,6 +27,15 @@ public class CoarizWildTPCommand implements CommandExecutor {
         try {
             plugin.reloadConfig();
             sender.sendMessage(plugin.colorize(plugin.getLangConfig().getString("reload_success", "CoarizWildTP configuration reloaded.")));
+
+            // Optionally, reinitialize economy if needed
+            if (plugin.setupEconomy()) {
+                plugin.economyEnabled = true;
+                sender.sendMessage(plugin.colorize(plugin.getLangConfig().getString("economy_reenabled", "Economy features re-enabled.")));
+            } else {
+                plugin.economyEnabled = false;
+                sender.sendMessage(plugin.colorize(plugin.getLangConfig().getString("economy_disabled", "Vault plugin not found or no economy provider found! Economy features are disabled.")));
+            }
         } catch (Exception e) {
             sender.sendMessage(plugin.colorize(plugin.getLangConfig().getString("reload_failure", "Failed to reload CoarizWildTP configuration.")));
             plugin.getLogger().log(java.util.logging.Level.SEVERE, "Error reloading configuration:", e);

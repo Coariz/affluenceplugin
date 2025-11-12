@@ -1,71 +1,93 @@
-#
-# Plugin by Coariz
-#
 world: world
-cost: 0 #Requires Vault (1.7.3) and an Economy plugin (EssentialsX) to work!
-max_x: 5000
-max_z: 5000
-min_x: -5000
-min_z: -5000
-spawn_radius: 500 # Radius away from spawn
-center_x: 0 # X coordinate of the center point
-center_z: 0 # Z coordinate of the center point
-radius: 1000 # Radius around the center point for teleportation
-max_attempts: 500 # Set value to 100-250 for budget servers
-logging_enabled: false # Enable or disable logging
-teleport_delay: 5 # Teleport delay in seconds
-cooldown: 5 # Cooldown in seconds
-allow_movement_during_delay: false # Allow or disallow movement during the delay
+spawn_radius: 1000
+center_x: 0
+center_z: 0
+radius: 2000
+max_attempts: 500
+logging_enabled: true
+cooldown: 5
+invincibility_duration: 5
+apply_effects: true
+send_title: true
 blacklisted_blocks:
   - WATER
   - LAVA
-  - FIRE
-  - CACTUS
-  - SWEET_BERRY_BUSH
-  - BAMBOO
-  - BAMBOO_SAPLING
 allowed_surface_materials:
   - GRASS_BLOCK
   - DIRT
-  - COARSE_DIRT
-  - PATH
-  - OAK_LEAVES
-  - SPRUCE_LEAVES
-  - BIRCH_LEAVES
-  - JUNGLE_LEAVES
-  - ACACIA_LEAVES
-  - DARK_OAK_LEAVES
-  - MANGROVE_LEAVES
-  - AZALEA_LEAVES
-  - FLOWERING_AZALEA_LEAVES
   - STONE
-  - COBBLESTONE
-  - OAK_LOG
-  - SPRUCE_LOG
-  - BIRCH_LOG
-  - JUNGLE_LOG
-  - ACACIA_LOG
-  - DARK_OAK_LOG
-  - MANGROVE_LOG
-  - CRIMSON_STEM
-  - WARPED_STEM
-  - STRIPPED_OAK_LOG
-  - STRIPPED_SPRUCE_LOG
-  - STRIPPED_BIRCH_LOG
-  - STRIPPED_JUNGLE_LOG
-  - STRIPPED_ACACIA_LOG
-  - STRIPPED_DARK_OAK_LOG
-  - STRIPPED_MANGROVE_LOG
-  - STRIPPED_CRIMSON_STEM
-  - STRIPPED_WARPED_STEM
-  - STRIPPED_OAK_WOOD
-  - STRIPPED_SPRUCE_WOOD
-  - STRIPPED_BIRCH_WOOD
-  - STRIPPED_JUNGLE_WOOD
-  - STRIPPED_ACACIA_WOOD
-  - STRIPPED_DARK_OAK_WOOD
-  - STRIPPED_MANGROVE_WOOD
-  - STRIPPED_CRIMSON_HYPHAE
-  - STRIPPED_WARPED_HYPHAE
-  
-  # Plugin version 1.2
+  - OAK_LEAVES
+  - SAND
+  - GRAVEL
+  - SNOW_BLOCK
+  - MYCELIUM
+  - PODZOL
+  - COARSE_DIRT
+  - CLAY
+  - SOUL_SAND
+  - SOUL_SOIL
+  - NETHERRACK
+  - END_STONE
+  - OBSIDIAN
+  - BEDROCK
+  - ICE
+  - FROSTED_ICE
+  - PACKED_ICE
+  - BLUE_ICE
+  - CONCRETE
+  - TERRACOTTA
+  - WHITE_TERRACOTTA
+  - ORANGE_TERRACOTTA
+  - MAGENTA_TERRACOTTA
+  - LIGHT_BLUE_TERRACOTTA
+  - YELLOW_TERRACOTTA
+  - LIME_TERRACOTTA
+  - PINK_TERRACOTTA
+  - GRAY_TERRACOTTA
+  - LIGHT_GRAY_TERRACOTTA
+  - CYAN_TERRACOTTA
+  - PURPLE_TERRACOTTA
+  - BLUE_TERRACOTTA
+  - BROWN_TERRACOTTA
+  - GREEN_TERRACOTTA
+  - RED_TERRACOTTA
+  - BLACK_TERRACOTTA
+  - DEEPSLATE
+  - GRASS_PATH
+  - MYCELIUM
+  - PODZOL
+  - COARSE_DIRT
+  - CLAY
+  - SOUL_SAND
+  - SOUL_SOIL
+  - NETHERRACK
+  - END_STONE
+  - OBSIDIAN
+  - BEDROCK
+  - ICE
+  - FROSTED_ICE
+  - PACKED_ICE
+  - BLUE_ICE
+  - CONCRETE
+  - TERRACOTTA
+  - WHITE_TERRACOTTA
+  - ORANGE_TERRACOTTA
+  - MAGENTA_TERRACOTTA
+  - LIGHT_BLUE_TERRACOTTA
+  - YELLOW_TERRACOTTA
+  - LIME_TERRACOTTA
+  - PINK_TERRACOTTA
+  - GRAY_TERRACOTTA
+  - LIGHT_GRAY_TERRACOTTA
+  - CYAN_TERRACOTTA
+  - PURPLE_TERRACOTTA
+  - BLUE_TERRACOTTA
+  - BROWN_TERRACOTTA
+  - GREEN_TERRACOTTA
+  - RED_TERRACOTTA
+  - BLACK_TERRACOTTA
+  - DEEPSLATE
+  - GRASS_PATH
+  - SAND
+  - GRAVEL
+  - SNOW_BLOCK
