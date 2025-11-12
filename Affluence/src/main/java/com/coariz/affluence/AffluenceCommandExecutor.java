@@ -179,21 +179,23 @@ public class AffluenceCommandExecutor implements CommandExecutor {
 
     private void sendHelp(CommandSender sender) {
         sender.sendMessage(plugin.formatMessage("&dAffluence plugin by Coariz"));
-        sender.sendMessage(plugin.formatMessage("&8[&dAffluence&8] &7List of commands, requires &daffluence.admin &7permission to execute"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence reload"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence set health_boost_per_value <value>"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence set health_boost_value <value>"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence set damage_boost_per_value <value>"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence set damage_boost_value <value>"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence set death_money_loss <value>"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence set money_per_kill <value>"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence set negative_money_threshold <value>"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence set ban_players <true/false>"));
-        sender.sendMessage(plugin.formatMessage("&7/affluence set ban_player_for <duration> (e.g., 30d, 1y, 10h)"));
+        sender.sendMessage(plugin.formatMessage(""));
         sender.sendMessage(plugin.formatMessage("&8[&dAffluence&8] &7List of commands, available to all players"));
-        sender.sendMessage(plugin.formatMessage("&7/aff balance or /aff bal"));
-        sender.sendMessage(plugin.formatMessage("&7/aff deposit or /aff dep <amount>"));
-        sender.sendMessage(plugin.formatMessage("&7/aff withdraw or /aff with <amount>"));
+        sender.sendMessage(plugin.formatMessage("&f/aff balance or /aff bal &7shows how much power balance you have"));
+        sender.sendMessage(plugin.formatMessage("&f/aff deposit or /aff dep <amount> &7deposits from normal economy balance to power balance"));
+        sender.sendMessage(plugin.formatMessage("&f/aff withdraw or /aff with <amount> &7withdraw from power balance to normal economy balance"));
+        sender.sendMessage(plugin.formatMessage(""));
+        sender.sendMessage(plugin.formatMessage("&8[&dAffluence&8] &7List of admin commands, requires &daffluence.admin &7permission to execute"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence reload &7Reloads the plugin"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence set health_boost_per_value <value> &7set the &fhealth boost&7 per <amount> of money"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence set health_boost_value <amount> &7set the money needed to get a &fhealth boost"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence set damage_boost_per_value <value>  &7set the &fdamage&7 boost per <amount> of money"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence set damage_boost_value <value> &7set the money needed to get a &fdamage boost"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence set death_money_loss <value> &7set the money lost every time the player dies"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence set money_per_kill <value> &7set the money that the player gets per kill"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence set negative_money_threshold <value> &7set the threshold for a player ban"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence set ban_players <true/false> &7set if the player that reaches the threshold gets banned or not"));
+        sender.sendMessage(plugin.formatMessage("&f/affluence set ban_player_for <duration> (e.g., 30d, 1y, 10h) &7set the duration of the ban"));
         sender.sendMessage(plugin.formatMessage("- end -"));
     }
 }
